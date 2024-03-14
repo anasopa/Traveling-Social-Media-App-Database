@@ -1,0 +1,22 @@
+/*Cancella un utente e tutti i dati relativi*/
+START TRANSACTION;
+SET @nickname = 'stefania_84';
+DELETE FROM Utente WHERE nickname = @nickname;
+DELETE FROM Follow WHERE utente = @nickname;
+DELETE FROM Dispositivo WHERE indirizzo_mac IN (SELECT mac_utente FROM Utente WHERE nickname = @nickname );
+DELETE FROM Metodo_pagamento WHERE nome_utente = @nickname;
+DELETE FROM Abbonamento WHERE utente = @nickname;
+DELETE FROM Acquisto WHERE utente = @nickname;
+DELETE FROM Pacchetto_viaggio WHERE proprietario_pacchetto = @nickname;
+SAVEPOINT S1;
+DELETE FROM Acquisizione WHERE proprietario_pacchetto = @nickname OR acquisitore = @nickname;
+DELETE FROM Algoritmo WHERE proprietario_pacchetto = @nickname OR ricevitore =  @nickname;
+DELETE FROM Galleria WHERE proprietario_pacchetto = @nickname OR creatore =  @nickname;
+DELETE FROM Recensione WHERE proprietario_pacchetto = @nickname OR recensitore =  @nickname;
+DELETE FROM Classificazione WHERE proprietario_pacchetto = @nickname;
+DELETE FROM Riferimento WHERE proprietario_pacchetto = @nickname;
+DELETE FROM Composizione WHERE proprietario_pacchetto = @nickname;
+DELETE FROM Collocazione WHERE proprietario_pacchetto = @nickname;
+COMMIT WORK;
+ROLLBACK TO S1;
+RELEASE SAVEPOINT S1;
